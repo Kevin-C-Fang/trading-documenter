@@ -1,2 +1,5 @@
 PyQt5==5.15.6
 pytest==7.0.1
+pandas==1.4.1
+openpyxl==3.0.9
+Pillow==9.0.1
