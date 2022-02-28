@@ -21,6 +21,7 @@ TBD
 * Pytest
 * Pandas
 * Openpyxl
+* openpyxl_image_loader
 * Pillow
 
 # License
