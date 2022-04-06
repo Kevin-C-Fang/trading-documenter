@@ -10,9 +10,9 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
 
 # Import MVC file to run GUI UI/UX
-from src.views.trading_documenter_view import TradingDocumenterView
-from src.controllers.trading_documenter_controller import TradingDocumenterController
-from src.models.trading_documenter_model import TradingDocumenterModel
+from views.trading_documenter_view import TradingDocumenterView
+from controllers.trading_documenter_controller import TradingDocumenterController
+from models.trading_documenter_model import TradingDocumenterModel
 
 
 def main():
@@ -21,8 +21,8 @@ def main():
     window = TradingDocumenterView()
     window.show()
 
-    model = TradingDocumenterModel(window.msgBox)
-    TradingDocumenterController(model_Obj=model, view_Obj=window)
+    #model = TradingDocumenterModel(window.msgBox)
+    #TradingDocumenterController(model_Obj=model, view_Obj=window)
 
     sys.exit(app.exec_())
 

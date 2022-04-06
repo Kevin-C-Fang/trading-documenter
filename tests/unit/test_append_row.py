@@ -10,7 +10,7 @@ from src.models.trading_documenter_model import TradingDocumenterModel
 @pytest.fixture
 def sample_row_data():
     return pd.DataFrame({
-        "Win/Loss": "Win",
+        "Win/Lose": "Win",
         "Risk:Reward": "1:1.25",
         "Patient": "Yes",
         "Not Emotional": "Yes",

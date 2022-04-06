@@ -1,0 +1,2 @@
+class TradingDocumenterController():
+    pass
