@@ -17,7 +17,6 @@ def sample_row_data():
         "ATR": "Yes",
         "Price Action": "Yes",
         "Time Frames": "Yes",
-        "Cumulative Delta": "No",
         "Trend Lines": "No",
         "SMA": "No",
         "Volume Profile": "No",

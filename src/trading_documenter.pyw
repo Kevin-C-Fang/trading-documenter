@@ -16,6 +16,7 @@ from models.trading_documenter_model import TradingDocumenterModel
 
 
 def main():
+    """Main/Runner Function"""
     app = QApplication([])
 
     window = TradingDocumenterView()
