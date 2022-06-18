@@ -1,6 +1,6 @@
 # Filename: trading_documenter_view.py
 
-"""Prvoides TradingDocumenterView, class for implementing GUI/View of desktop application
+"""Provides TradingDocumenterView, class for implementing GUI/View of desktop application
 
 TradingDocumenterView implements the front-end/UI of the application using layouts and widgets from QWidgets.
 """
@@ -8,21 +8,26 @@ TradingDocumenterView implements the front-end/UI of the application using layou
 # Import ctypes to tell windows this is my registered application
 from asyncio.windows_events import NULL
 import ctypes
+import os
+from datetime import datetime
 
 # Import PyQt5 and the required widgets from PyQt5.QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import (QVBoxLayout,QHBoxLayout, QLabel, QGroupBox, QLineEdit, QPlainTextEdit,
                              QMainWindow, QMessageBox, QPushButton, QWidget, QCheckBox)
+
+# Import Pyscreenshot for taking screenshot of window
+import pyscreenshot
 
 class TradingDocumenterView(QMainWindow):
     """Class that implements the view for the Model-View-Controller(MVC) design pattern.
     
     :param QVBoxLayout _general_vertical_layout
     :param list[QPushButton] EnterAndClearButtons
-    :param list[Union[]] Options
+    :param list[Union[[QCheckBox, QLineEdit, QPushButton]] Options
     :param QPlainTextEdit Notes
-    :param QPixmap Snippet
+    :param QLabel _screenshot_label
     """
 
     def __init__(self) -> None:
@@ -35,7 +40,7 @@ class TradingDocumenterView(QMainWindow):
 
         # Set properties such as window name, icon, size, and placement when executed
         self.setWindowTitle("Trading Documenter | Day Trading Documenter")
-        self.setWindowIcon(QIcon('imgs/icon.png'))
+        self.setWindowIcon(QIcon('imgs/application/icon.png'))
         self.setFixedSize(1120, 640)
         self.move(400, 200)
 
@@ -47,7 +52,7 @@ class TradingDocumenterView(QMainWindow):
         
         # Create title heading, options, notes, and buttons
         self._create_title_heading()
-        self._add_options_notes_snippet()
+        self._add_options_notes_screenshot()
         self._create_enter_and_clear_buttons()
 
     def _create_title_heading(self) -> None:
@@ -57,20 +62,20 @@ class TradingDocumenterView(QMainWindow):
         title.setAlignment(Qt.AlignCenter)
         self._general_vertical_layout.addWidget(title)
 
-    def _add_options_notes_snippet(self) -> None:
+    def _add_options_notes_screenshot(self) -> None:
         "Creates layouts to be added to _general_vertical_layout and calls create functions for each groupbox section"
 
         # Create layouts and add vertical to horizontal then horizontal onto _general_vertical_layout
-        options_notes_snippet_horizontal_layout = QHBoxLayout()
-        options_notes_snippet_horizontal_layout.setContentsMargins(80, 0, 80, 0)
+        options_notes_screenshot_horizontal_layout = QHBoxLayout()
+        options_notes_screenshot_horizontal_layout.setContentsMargins(80, 0, 80, 0)
         options_notes_vertical_layout = QVBoxLayout()
-        options_notes_snippet_horizontal_layout.addLayout(options_notes_vertical_layout)
+        options_notes_screenshot_horizontal_layout.addLayout(options_notes_vertical_layout)
 
-        self._general_vertical_layout.addLayout(options_notes_snippet_horizontal_layout)
+        self._general_vertical_layout.addLayout(options_notes_screenshot_horizontal_layout)
 
         self._create_options(options_notes_vertical_layout)
         self._create_notes(options_notes_vertical_layout)
-        self._create_snippet(options_notes_snippet_horizontal_layout)
+        self._create_screenshot(options_notes_screenshot_horizontal_layout)
 
     def _create_options(self, options_notes_vertical_layout) -> None:
         """Creates options to be added to internal group box layout
@@ -88,7 +93,7 @@ class TradingDocumenterView(QMainWindow):
         self.Options[-1].setPlaceholderText("Risk:Reward")
         self.Options[-1].setFixedWidth(110)
 
-        self.Options.append(QPushButton("Snippet"))
+        self.Options.append(QPushButton("Screenshot"))
         self.Options[-1].setFixedWidth(110)
 
         for option in self.Options:
@@ -104,20 +109,19 @@ class TradingDocumenterView(QMainWindow):
         self.Notes = QPlainTextEdit()
         notes_group_box_Layout.addWidget(self.Notes)
 
-    def _create_snippet(self, options_notes_snippet_horizontal_layout) -> None:
-        """Creates snippet picture to be added to internal group box layout
+    def _create_screenshot(self, options_notes_screenshot_horizontal_layout) -> None:
+        """Creates screenshot picture to be added to internal group box layout
         
-        :param QHBoxLayout options_notes_snippet_horizontal_layout: Layout to add groupbox to
+        :param QHBoxLayout options_notes_screenshot_horizontal_layout: Layout to add groupbox to
         """
 
-        snippet_group_box_layout = self._create_groupbox("Snippet", options_notes_snippet_horizontal_layout)
+        screenshot_group_box_layout = self._create_groupbox("Screenshot", options_notes_screenshot_horizontal_layout)
 
         # Create label and attach Pixmap
-        label = QLabel()
-        self.Snippet = QPixmap("imgs/filler.PNG")
-        label.setPixmap(self.Snippet)
+        self._screenshot_label = QLabel()
+        self._screenshot_label.setPixmap(QPixmap("imgs/application/filler.PNG"))
         
-        snippet_group_box_layout.addWidget(label)
+        screenshot_group_box_layout.addWidget(self._screenshot_label)
 
     def _create_groupbox(self, title, layout) -> QVBoxLayout:
         """Creates group box with internal layout to be returned for adding components
@@ -151,6 +155,34 @@ class TradingDocumenterView(QMainWindow):
         for button in self.EnterAndClearButtons:
             button.setFixedSize(60, 35)
             horizontal_layout.addWidget(button)
+
+    def clearAllValues(self) -> None:
+        """Clears all values in QWidgets/Controls"""
+
+        for option in self.Options:
+            data_type = type(option)
+            if data_type == QCheckBox:
+                option.setChecked(False)
+            elif data_type == QLineEdit:
+                option.clear()
+
+        self.Notes.clear()
+        self._screenshot_label.setPixmap(QPixmap("imgs/filler.PNG"))
+
+    def takeScreenshot(self) -> None:
+        """Allows user to take a screenshot of their trade"""
+        
+        # Create absolute path 
+        formated_date = datetime.now().strftime("%m-%d-%Y, %H-%M-%S")
+        abs_path = os.path.abspath("imgs/user/" + formated_date + ".PNG")  
+
+        # Minimize window to take screenshot and save then it will un-minimize the window
+        self.setWindowState(Qt.WindowMinimized)
+        curr = pyscreenshot.grab()
+        curr.save(abs_path)
+        self.setWindowState(Qt.WindowNoState)
+        
+        self._screenshot_label.setPixmap(QPixmap(abs_path))
 
     def createMessageBox(self, message: str) -> None:
         """Creates a message box with text using the parameter message and displays in the middle of the application

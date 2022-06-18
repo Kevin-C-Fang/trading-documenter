@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Filename: trading_documenter.pyw
 
 """Trading documenter is a desktop GUI that allows the user to record trades they have made."""
@@ -22,8 +24,8 @@ def main():
     window = TradingDocumenterView()
     window.show()
 
-    #model = TradingDocumenterModel(window.msgBox)
-    #TradingDocumenterController(model_Obj=model, view_Obj=window)
+    model = TradingDocumenterModel(window.createMessageBox)
+    TradingDocumenterController(model_Obj=model, view_Obj=window)
 
     sys.exit(app.exec_())
 
