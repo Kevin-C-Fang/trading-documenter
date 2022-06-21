@@ -1,7 +1,7 @@
 # test_create_excel_file_name.py
 
 import os
-from datetime import date
+from datetime import datetime
 from src.models.trading_documenter_model import TradingDocumenterModel
 
 
@@ -9,9 +9,12 @@ from src.models.trading_documenter_model import TradingDocumenterModel
 
 def test_if_create_excel_file_name_working():
     """_create_excel_file_name should match current date file name"""
-    today = date.today()
+    
+    today = datetime.today().strftime("%m-%d-%Y")
 
-    formated_date = today.strftime("%d-%m-%Y")
-    abs_path = os.path.abspath("data/" + formated_date + ".xlsx")
+    directory = "tests/unit/fixtures/" + today + "/"
+    abs_path = os.path.abspath(directory + today + ".xlsx")
 
     assert TradingDocumenterModel._create_excel_file_name() == abs_path
+
+    os.removedirs(directory)

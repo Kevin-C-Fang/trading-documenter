@@ -10,7 +10,8 @@ from src.models.trading_documenter_model import TradingDocumenterModel
 @pytest.fixture
 def sample_row_data():
     return pd.DataFrame({
-        "Win/Lose": "Win",
+        "Win": "Win",
+        "Lose": "Lose",
         "Risk:Reward": "1:1.25",
         "Patient": "Yes",
         "Not Emotional": "Yes",
@@ -21,7 +22,7 @@ def sample_row_data():
         "SMA": "No",
         "Volume Profile": "No",
         "Notes": """No""",
-        "Snippet": None
+        "Snippet": "data/6-20-2022/"
     }, index=[0])
 
 @pytest.fixture
@@ -42,3 +43,4 @@ def test_if_appendData_working(sample_row_data, testing_file_path, get_appended_
 
     assert assert_frame_equal(get_appended_data(), sample_row_data, check_dtype=False) == None
     
+    #TODO: Delete created file or data

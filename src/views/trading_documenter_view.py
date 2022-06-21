@@ -10,25 +10,29 @@ from asyncio.windows_events import NULL
 import ctypes
 import os
 from datetime import datetime
+from types import NoneType
+
+# Import ImageGrab from PIL for getting contents of clipboard
+from PIL import ImageGrab
 
 # Import PyQt5 and the required widgets from PyQt5.QtWidgets
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QVBoxLayout,QHBoxLayout, QLabel, QGroupBox, QLineEdit, QPlainTextEdit,
                              QMainWindow, QMessageBox, QPushButton, QWidget, QCheckBox)
-
-# Import Pyscreenshot for taking screenshot of window
-import pyscreenshot
 
 class TradingDocumenterView(QMainWindow):
     """Class that implements the view for the Model-View-Controller(MVC) design pattern.
     
-    :param QVBoxLayout _general_vertical_layout
-    :param list[QPushButton] EnterAndClearButtons
-    :param list[Union[[QCheckBox, QLineEdit, QPushButton]] Options
-    :param QPlainTextEdit Notes
-    :param QLabel _screenshot_label
+    :param QVBoxLayout _general_vertical_layout: Vertical layout that holds the controls
+    :param list[QPushButton] EnterAndClearButtons: List of enter and clear buttons
+    :param list[Union[[QCheckBox, QLineEdit, QPushButton]] Options: List of widgets for options
+    :param QPlainTextEdit Notes: Widget for holding notes
+    :param QLabel _screenshot_label: Label that holds the screenshot/QPixMap
+    :param str ScreenshotPath: Absolute path of screenshot 
     """
+
+    ScreenshotPath = ""
 
     def __init__(self) -> None:
         """View Initializer"""
@@ -86,14 +90,14 @@ class TradingDocumenterView(QMainWindow):
         options_group_box_Layout = self._create_groupbox("Options", options_notes_vertical_layout)
 
         # Create options and add to group_box_Layout
-        self.Options = [QCheckBox("Win"), QCheckBox("Lose"), QCheckBox("Patient/Not Emotional"), QCheckBox("ATR"), 
+        self.Options = [QCheckBox("Win"), QCheckBox("Lose"), QCheckBox("Patient"), QCheckBox("ATR"), 
                         QCheckBox("Price Action"), QCheckBox("Time Frames"), QCheckBox("Trend Lines"), QCheckBox("SMA"), QCheckBox("Volume Profile")]
 
         self.Options.append(QLineEdit())
         self.Options[-1].setPlaceholderText("Risk:Reward")
         self.Options[-1].setFixedWidth(110)
 
-        self.Options.append(QPushButton("Screenshot"))
+        self.Options.append(QPushButton("Copy Clipboard"))
         self.Options[-1].setFixedWidth(110)
 
         for option in self.Options:
@@ -106,7 +110,7 @@ class TradingDocumenterView(QMainWindow):
         """
         
         notes_group_box_Layout = self._create_groupbox("Notes", options_notes_vertical_layout)
-        self.Notes = QPlainTextEdit()
+        self.Notes = QPlainTextEdit("""Pro:\n\nCon:\n""")
         notes_group_box_Layout.addWidget(self.Notes)
 
     def _create_screenshot(self, options_notes_screenshot_horizontal_layout) -> None:
@@ -167,22 +171,34 @@ class TradingDocumenterView(QMainWindow):
                 option.clear()
 
         self.Notes.clear()
-        self._screenshot_label.setPixmap(QPixmap("imgs/filler.PNG"))
+        self._screenshot_label.setPixmap(QPixmap("imgs/application/filler.PNG"))
 
     def takeScreenshot(self) -> None:
-        """Allows user to take a screenshot of their trade"""
+        """Saves screenshot of trade and shows in preview"""
         
-        # Create absolute path 
-        formated_date = datetime.now().strftime("%m-%d-%Y, %H-%M-%S")
-        abs_path = os.path.abspath("imgs/user/" + formated_date + ".PNG")  
+        # Create absolute path and directory if needed
+        today = datetime.today().strftime("%m-%d-%Y")
+        specified_time_and_date = datetime.now().strftime("%m-%d-%Y, %H-%M-%S")
+        abs_path = os.path.abspath("data/" + today + "/" + specified_time_and_date + ".PNG")  
 
-        # Minimize window to take screenshot and save then it will un-minimize the window
-        self.setWindowState(Qt.WindowMinimized)
-        curr = pyscreenshot.grab()
-        curr.save(abs_path)
-        self.setWindowState(Qt.WindowNoState)
-        
-        self._screenshot_label.setPixmap(QPixmap(abs_path))
+        # Create abs path for intended directory to check if it exists
+        check_path = os.path.abspath("data/" + today)
+        if not os.path.exists(check_path):
+            os.makedirs(check_path)
+
+        # Grab image from clipboard 
+        clipboard_image = ImageGrab.grabclipboard()
+
+        # If result is not an image then show message box and return
+        if(type(clipboard_image) == NoneType):
+            self.createMessageBox("Take a snippet by holding Windows + Shift + S")
+            return
+
+        # Save image and path to be passed to modeling
+        clipboard_image.save(abs_path)
+        self.ScreenshotPath = abs_path
+
+        self._screenshot_label.setPixmap(QPixmap(abs_path).scaled(650, 450, aspectRatioMode=0, transformMode=1))
 
     def createMessageBox(self, message: str) -> None:
         """Creates a message box with text using the parameter message and displays in the middle of the application
@@ -191,5 +207,7 @@ class TradingDocumenterView(QMainWindow):
         """
 
         message_Box = QMessageBox()
+        message_Box.setWindowIcon((QIcon('imgs/application/icon.png')))
+        message_Box.setWindowTitle("Error: Follow steps below to resolve")
         message_Box.setText(message)
         message_Box.exec_()
