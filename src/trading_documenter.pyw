@@ -24,7 +24,7 @@ def main():
     window = TradingDocumenterView()
     window.show()
 
-    model = TradingDocumenterModel(window.createMessageBox)
+    model = TradingDocumenterModel()
     TradingDocumenterController(model_Obj=model, view_Obj=window)
 
     sys.exit(app.exec_())

@@ -45,6 +45,8 @@ class TradingDocumenterController:
         
         data_dict = self._generate_dict_of_data()
 
+        self.model.appendDataToExcel(data_dict)
+
     def _generate_dict_of_data(self) -> dict:
         """Generates the data from the values entered into the view"""
 
