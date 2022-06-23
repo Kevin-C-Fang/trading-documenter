@@ -170,7 +170,7 @@ class TradingDocumenterView(QMainWindow):
             elif data_type == QLineEdit:
                 option.clear()
 
-        self.Notes.clear()
+        self.Notes.setPlainText("""Pro:\n\nCon:\n""")
         self._screenshot_label.setPixmap(QPixmap("imgs/application/filler.PNG"))
 
     def takeScreenshot(self) -> None:

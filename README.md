@@ -11,19 +11,22 @@ Trading documenter is a desktop GUI that allows the user to record trades they h
 # Features
 * Checkbox options that easily record reasons why the trade was taken
 * Note box for more detailed description.
-* Takes screenshot of trade
+* Saves snippet from clipboard
 
 # How to use?
-TBD
+* Check whichever boxes that you followed for the current trade
+* Press Windows + Shift + S and take snippet to save to clipboard
+* Press Copy Clipboard button to save snippet
+* Enter in notes for trade
+* Press enter to automatically save data to folder in data/m-d-y
+* Press clear to clear all entered in data and reset to blank fields
 
 # Dependencies
 * PyQt5
 * Pytest
 * Pandas
-* Openpyxl
-* openpyxl_image_loader
 * Pillow
-* PyScreenshot
+* openpyxl
 
 # License
 GPL-v3.0 

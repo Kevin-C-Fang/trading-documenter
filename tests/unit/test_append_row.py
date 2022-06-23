@@ -1,5 +1,6 @@
 # test_appendData.py
 
+import datetime
 import os, pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
@@ -8,39 +9,47 @@ from src.models.trading_documenter_model import TradingDocumenterModel
 """Tests whether row data is appended to the excel file"""
 
 @pytest.fixture
-def sample_row_data():
-    return pd.DataFrame({
-        "Win": "Win",
-        "Lose": "Lose",
-        "Risk:Reward": "1:1.25",
-        "Patient": "Yes",
-        "Not Emotional": "Yes",
-        "ATR": "Yes",
-        "Price Action": "Yes",
-        "Time Frames": "Yes",
-        "Trend Lines": "No",
-        "SMA": "No",
-        "Volume Profile": "No",
-        "Notes": """No""",
-        "Snippet": "data/6-20-2022/"
-    }, index=[0])
+def get_sample_dict():
+    return {"Win": "✓",
+            "Lose": "✗",
+            "Patient": "✗",
+            "ATR": "✓",
+            "Price Action": "✗",
+            "Time Frames": "✓",
+            "Trend Lines": "✗",
+            "SMA": "✓",
+            "Volume Profile": "✓",
+            "Risk:Reward": "1:1.25",
+            "Notes": """Testing""",
+            "Path": "data/6-20-2022/"
+            }
+
 
 @pytest.fixture
-def testing_file_path():
-    return os.path.abspath("tests/unit/fixtures/testing_append_row.xlsx")
+def get_pre_path():
+    return "tests/unit/fixtures/"
 
 @pytest.fixture
-def get_appended_data(testing_file_path):
-    data_frame = pd.read_excel(testing_file_path())
+def get_Abs_Path():
+    pre_path = get_pre_path()
+    folder_and_file_name = datetime.today().strftime("%m-%d-%Y")
+
+    TradingDocumenterModel.AbsPath = os.path.abspath(pre_path + folder_and_file_name + "/" + folder_and_file_name + ".xlsx")
+
+    yield TradingDocumenterModel.AbsPath
+
+    os.removedirs(pre_path + folder_and_file_name + "/")
+
+@pytest.fixture
+def get_appended_data():
+    data_frame = pd.read_excel(TradingDocumenterModel.AbsPath)
     last_row = data_frame.tail(1)
 
     return last_row
 
 def test_if_appendData_working(sample_row_data, testing_file_path, get_appended_data):
-    """sample_row_data should match appended data taken from the excel file"""
+    """get_sample_dict should match appended data taken from the excel file"""
     
-    TradingDocumenterModel.appendData(testing_file_path, sample_row_data)
+    TradingDocumenterModel.appendDataToExcel(get_sample_dict)
 
-    assert assert_frame_equal(get_appended_data(), sample_row_data, check_dtype=False) == None
-    
-    #TODO: Delete created file or data
+    assert assert_frame_equal(get_appended_data, get_sample_dict) == None

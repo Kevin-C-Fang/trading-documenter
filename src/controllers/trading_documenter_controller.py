@@ -46,6 +46,7 @@ class TradingDocumenterController:
         data_dict = self._generate_dict_of_data()
 
         self.model.appendDataToExcel(data_dict)
+        self.view.clearAllValues()
 
     def _generate_dict_of_data(self) -> dict:
         """Generates the data from the values entered into the view"""
@@ -54,7 +55,7 @@ class TradingDocumenterController:
 
         for option in self.view.Options:
             if type(option) == QCheckBox:
-                combined_dict[option.text()] = option.isChecked()
+                combined_dict[option.text()] = "✓" if option.isChecked() == True else "✗"
             if type(option) == QLineEdit:
                 combined_dict["Risk:Reward"] = option.text()
 
