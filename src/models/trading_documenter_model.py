@@ -19,10 +19,12 @@ import pandas as pd
 class TradingDocumenterModel():
     """Class that implements the usage of data to be used in the application
     
+    :param str directory: Path of folder that contains the xlsx and png of the day
     :param str AbsPath: Absolute path of the excel sheet
     """
 
     AbsPath = ""
+    directory = ""
 
     def __init__(self) -> None:
         """Model Initializer"""
@@ -31,19 +33,19 @@ class TradingDocumenterModel():
         self.options['strings_to_formulas'] = False
         self.options['strings_to_urls'] = False
 
+        # Create abs path
+        pre_path = "data/"
+        folder_and_file_name = datetime.today().strftime("%m-%d-%Y")
+        self.directory = pre_path + folder_and_file_name + "/"
+        self.AbsPath = os.path.abspath(pre_path + folder_and_file_name + "/" + folder_and_file_name + ".xlsx")  
+
         self._create_excel_file_name()
 
     def _create_excel_file_name(self) -> str:
         """Creates excel file name and saves path as class property"""
 
-        # Create abs path
-        pre_path = "data/"
-        folder_and_file_name = datetime.today().strftime("%m-%d-%Y")
-        directory = pre_path + folder_and_file_name + "/"
-        self.AbsPath = os.path.abspath(pre_path + folder_and_file_name + "/" + folder_and_file_name + ".xlsx")  
-
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
 
         # Use openpyxl to create empty excel file
         wb = openpyxl.Workbook()
